@@ -20,6 +20,12 @@ export default function FiltersModal({ open, onClose, onApply }) {
     onClose();
   };
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
     <AnimatePresence>
       {open && (
@@ -30,7 +36,7 @@ export default function FiltersModal({ open, onClose, onApply }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleBackdropClick}
           />
 
           {/* Modal */}
@@ -52,6 +58,7 @@ export default function FiltersModal({ open, onClose, onApply }) {
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Status */}
                 <label className="block">
                   <span className="text-sm text-slate-400">Status</span>
                   <select
@@ -66,6 +73,7 @@ export default function FiltersModal({ open, onClose, onApply }) {
                   </select>
                 </label>
 
+                {/* Interface Name */}
                 <label className="block">
                   <span className="text-sm text-slate-400">Interface Name</span>
                   <input
@@ -76,6 +84,7 @@ export default function FiltersModal({ open, onClose, onApply }) {
                   />
                 </label>
 
+                {/* Min Duration */}
                 <label className="block">
                   <span className="text-sm text-slate-400">
                     Min Duration (ms)
@@ -88,6 +97,7 @@ export default function FiltersModal({ open, onClose, onApply }) {
                   />
                 </label>
 
+                {/* Max Duration */}
                 <label className="block">
                   <span className="text-sm text-slate-400">
                     Max Duration (ms)

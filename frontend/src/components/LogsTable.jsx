@@ -1,34 +1,49 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { fetchExecutions } from "../services/api";
+import { fetchExecutions } from "../services/api"; // your API service
 import { formatDistanceToNow } from "date-fns";
-import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
-import { FaCheckCircle, FaTimesCircle, FaInfoCircle } from "react-icons/fa";
+import {
+  FaSortUp,
+  FaSortDown,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaInfoCircle,
+} from "react-icons/fa";
 
 export default function LogsTable({ range }) {
   const [items, setItems] = useState([]);
   const [nextCursor, setNextCursor] = useState(null);
   const [sort, setSort] = useState("desc");
   const [filterText, setFilterText] = useState("");
-  const pageSize = 50;
 
+  // Set large page size as needed
+  const pageSize = 100;
+
+  // Load data from backend
   const loadPage = async (cursor = null) => {
     try {
       const params = { limit: pageSize, sort, range };
       if (cursor) params.cursor = cursor;
+
       const res = await fetchExecutions(params);
-      setItems(res.items || []);
+
+      // Append if cursor exists, otherwise replace
+      setItems((prev) =>
+        cursor ? [...prev, ...(res.items || [])] : res.items || []
+      );
       setNextCursor(res.nextCursor || null);
     } catch (err) {
       console.error(err);
     }
   };
 
+  // Initial load + auto-refresh every 30s
   useEffect(() => {
     loadPage();
-    const intv = setInterval(() => loadPage(), 30 * 1000); // auto-refresh every 30s
-    return () => clearInterval(intv);
+    const interval = setInterval(() => loadPage(), 30 * 1000);
+    return () => clearInterval(interval);
   }, [range, sort]);
 
+  // Filter items based on input
   const filtered = useMemo(() => {
     if (!filterText) return items;
     const q = filterText.toLowerCase();
@@ -50,8 +65,7 @@ export default function LogsTable({ range }) {
             className="flex items-center gap-2 px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm text-gray-300 border border-gray-600 transition"
             onClick={() => setSort((s) => (s === "desc" ? "asc" : "desc"))}
           >
-            Sort
-            {sort === "asc" ? <FaSortUp /> : <FaSortDown />}
+            Sort {sort === "asc" ? <FaSortUp /> : <FaSortDown />}
           </button>
           <input
             className="px-3 py-1 bg-gray-800 border border-gray-600 rounded-lg text-sm text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
@@ -59,6 +73,9 @@ export default function LogsTable({ range }) {
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
           />
+        </div>
+        <div className="bg-amber-400 text-black px-1 py-2 rounded">
+          {items.length} entries
         </div>
         <button
           className="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-sm text-white disabled:opacity-50 transition cursor-pointer"
@@ -89,7 +106,9 @@ export default function LogsTable({ range }) {
                   idx % 2 === 0 ? "bg-gray-900" : "bg-gray-850"
                 }`}
               >
-                <td className="p-3">{it.interfaceName}</td>
+                <td className="p-3">
+                  {idx + 1}. {it.interfaceName}
+                </td>
                 <td className="p-3 truncate max-w-xs" title={it.integrationKey}>
                   {it.integrationKey?.slice(0, 30) || "-"}
                 </td>

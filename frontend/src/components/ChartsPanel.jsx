@@ -109,13 +109,13 @@ export default function ChartsPanel({ summary, range }) {
             Loading chart...
           </div>
         ) : pieData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={220}>
+          <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
                 data={pieData}
                 dataKey="value"
                 nameKey="name"
-                outerRadius={80}
+                outerRadius={60}
                 label
               >
                 {pieData.map((entry, idx) => (
